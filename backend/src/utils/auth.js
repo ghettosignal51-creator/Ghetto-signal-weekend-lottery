@@ -2,55 +2,36 @@ const jwt = require('jwt-simple');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_key_change_in_production_abc123';
+const JWT_SECRET = process.env.JWT_SECRET;
+if (!JWT_SECRET && process.env.NODE_ENV === 'production') {
+  throw new Error('JWT_SECRET must be configured in production.');
+}
+const signingSecret = JWT_SECRET || 'local-development-only-secret-change-me';
 
-// Generate JWT token
-const generateToken = (user) => {
-  const payload = {
-    id: user.id,
-    phone: user.phone,
-    username: user.username,
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (15 * 60) // 15 minutes
-  };
-  return jwt.encode(payload, JWT_SECRET);
-};
+const generateToken = (user) => jwt.encode({
+  id: user.id,
+  phone: user.phone,
+  username: user.username,
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + (15 * 60)
+}, signingSecret);
 
-// Verify JWT token
 const verifyToken = (token) => {
   try {
-    const decoded = jwt.decode(token, JWT_SECRET);
-    return decoded;
+    return jwt.decode(token, signingSecret);
   } catch (err) {
     return null;
   }
 };
 
-// Generate refresh token (7 days)
-const generateRefreshToken = (userId) => {
-  const payload = {
-    id: userId,
-    type: 'refresh',
-    iat: Math.floor(Date.now() / 1000),
-    exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60) // 7 days
-  };
-  return jwt.encode(payload, JWT_SECRET);
-};
+const generateRefreshToken = (userId) => jwt.encode({
+  id: userId,
+  type: 'refresh',
+  iat: Math.floor(Date.now() / 1000),
+  exp: Math.floor(Date.now() / 1000) + (7 * 24 * 60 * 60)
+}, signingSecret);
 
-// Hash password
-const hashPassword = async (password) => {
-  return bcrypt.hash(password, 10);
-};
+const hashPassword = (password) => bcrypt.hash(password, 10);
+const comparePassword = (password, hash) => bcrypt.compare(password, hash);
 
-// Compare passwords
-const comparePassword = async (password, hash) => {
-  return bcrypt.compare(password, hash);
-};
-
-module.exports = {
-  generateToken,
-  verifyToken,
-  generateRefreshToken,
-  hashPassword,
-  comparePassword
-};
+module.exports = { generateToken, verifyToken, generateRefreshToken, hashPassword, comparePassword };

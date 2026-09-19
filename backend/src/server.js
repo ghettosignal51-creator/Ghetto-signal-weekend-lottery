@@ -1,10 +1,12 @@
 const express = require('express');
+const path = require('path');
 const cors = require('cors');
 const { generateToken, hashPassword, comparePassword, verifyToken } = require('./utils/auth');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const users = [];
+const frontendDirectory = path.resolve(__dirname, '../../dist');
 
 app.use(cors({ origin: process.env.FRONTEND_URL || true }));
 app.use(express.json());
@@ -40,5 +42,12 @@ app.get('/api/auth/me', (req, res) => {
   return res.json({ user: sanitizeUser(user) });
 });
 
-if (require.main === module) app.listen(port, () => console.log(`Quick Odds backend listening on port ${port}`));
+// In production, serve the built game and authentication page from this same server.
+app.use(express.static(frontendDirectory));
+app.get('*', (req, res, next) => {
+  if (req.path.startsWith('/api/')) return next();
+  return res.sendFile(path.join(frontendDirectory, 'index.html'));
+});
+
+if (require.main === module) app.listen(port, () => console.log(`Quick Odds listening on port ${port}`));
 module.exports = app;
