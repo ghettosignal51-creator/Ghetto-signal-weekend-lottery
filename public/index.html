@@ -1,43 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Quick Odds Uganda - Mobile lottery game">
-    <meta name="theme-color" content="#000000">
-    <title>Quick Odds Uganda 🎮</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: Arial, sans-serif;
-            background: #000;
-            overflow: hidden;
-            width: 100vw;
-            height: 100vh;
-        }
-        
-        #game {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-        }
-        
-        canvas {
-            display: block;
-            margin: auto;
-            max-width: 100%;
-            max-height: 100%;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Quick Odds Uganda - Mobile lottery game" />
+  <meta name="theme-color" content="#05070d" />
+  <title>Quick Odds Uganda</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; font-family: Arial, sans-serif; background: #05070d; }
+    #game { position: absolute; inset: 0; width: 100%; height: 100%; }
+    canvas { display: block; margin: auto; max-width: 100%; max-height: 100%; }
+    #authOverlay { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(5, 7, 13, .82); backdrop-filter: blur(6px); z-index: 10; }
+    #authPanel { width: min(420px, 100%); background: #0e1520; border: 1px solid rgba(116, 144, 201, .5); border-radius: 18px; padding: 24px 20px 18px; box-shadow: 0 24px 70px rgba(0, 0, 0, .45); }
+    h1 { color: #f5f7ff; font-size: 1.8rem; text-align: center; margin: 0 0 8px; }
+    #authPanel p { color: #b7bfd6; text-align: center; margin: 0 0 18px; }
+    .auth-toggle { display: flex; gap: 8px; background: rgba(255,255,255,.04); border-radius: 12px; padding: 4px; margin-bottom: 16px; }
+    .auth-toggle button { flex: 1; background: transparent; color: #dfe9ff; border: 0; border-radius: 10px; padding: 10px 12px; cursor: pointer; font-weight: 700; }
+    .auth-toggle button.active { background: linear-gradient(135deg, #54a0ff, #2ecc71); color: #05121c; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+    label { color: #dfe9ff; font-size: .85rem; font-weight: 600; }
+    input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(159,171,200,.34); background: rgba(255,255,255,.02); color: #f4f7fb; font-size: 1rem; }
+    input:focus { outline: 2px solid rgba(84,160,255,.45); }
+    .submit-btn { width: 100%; border: 0; border-radius: 12px; background: linear-gradient(135deg, #54a0ff, #2ecc71); color: #06131d; font-size: 1rem; font-weight: 800; padding: 13px 14px; cursor: pointer; }
+    .submit-btn:disabled { opacity: .65; cursor: wait; }
+    .status { min-height: 22px; margin-top: 12px; font-size: .9rem; color: #ffd166; text-align: center; }
+    .status.error { color: #ff8c8c; }
+  </style>
 </head>
 <body>
-    <div id="game"></div>
+  <div id="game"></div>
+  <div id="authOverlay">
+    <section id="authPanel" aria-labelledby="authTitle">
+      <h1 id="authTitle">Quick Odds</h1>
+      <p id="authSubtitle">Sign in to start playing</p>
+      <div class="auth-toggle" aria-label="Authentication mode">
+        <button type="button" class="active" data-mode="login">Login</button>
+        <button type="button" data-mode="signup">Sign up</button>
+      </div>
+      <form id="authForm">
+        <div class="form-group" id="usernameGroup" hidden>
+          <label for="username">Username</label>
+          <input id="username" name="username" type="text" autocomplete="username" />
+        </div>
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <input id="phone" name="phone" type="tel" placeholder="e.g. +256700000000" autocomplete="tel" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input id="password" name="password" type="password" minlength="6" autocomplete="current-password" required />
+        </div>
+        <button class="submit-btn" type="submit">Login</button>
+      </form>
+      <div id="authStatus" class="status" aria-live="polite"></div>
+    </section>
+  </div>
+  <script src="./app.js"></script>
 </body>
 </html>
