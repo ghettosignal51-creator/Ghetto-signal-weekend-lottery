@@ -2,7 +2,7 @@ const jwt = require('jwt-simple');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || 'dev_secret_key_change_in_production_abc123';
 
 // Generate JWT token
 const generateToken = (user) => {
